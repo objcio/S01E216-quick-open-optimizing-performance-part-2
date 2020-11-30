@@ -60,19 +60,11 @@ extension Array where Element == [UInt8] {
         var result: [(string: [UInt8], score: Int)] = []
         let resultQueue = DispatchQueue(label: "result")
         let cores = ProcessInfo.processInfo.activeProcessorCount
-        
-        var array = self
-        let rest = count % cores
-        if rest > 0 {
-            let paddingCount = cores - rest
-            array.append(contentsOf: Array(repeating: [], count: paddingCount))
-        }
-        
-        let chunkSize = array.count/cores
+        let chunkSize = count / cores
         DispatchQueue.concurrentPerform(iterations: cores) { ix in
             let start = ix * chunkSize
-            let end = Swift.min(start + chunkSize, array.endIndex)
-            let chunk: [([UInt8], Int)] = array[start..<end].compactMap {
+            let end = ix == cores - 1 ? endIndex : start + chunkSize
+            let chunk: [([UInt8], Int)] = self[start..<end].compactMap {
                 guard let match = $0.fuzzyMatch3(n) else { return nil }
                 return ($0, match.score)
             }
