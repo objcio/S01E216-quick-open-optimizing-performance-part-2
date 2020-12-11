@@ -61,6 +61,7 @@ extension Array where Element == [UInt8] {
         let resultQueue = DispatchQueue(label: "result")
         let cores = ProcessInfo.processInfo.activeProcessorCount
         let chunkSize = self.count/cores
+        // Note: there is a bug in this code, it's only here to match the episode's contents. Here is the fix: https://github.com/objcio/S01E216-quick-open-optimizing-performance-part-2/pull/2
         DispatchQueue.concurrentPerform(iterations: cores) { ix in
             let start = ix * chunkSize
             let end = Swift.min(start + chunkSize, endIndex)
